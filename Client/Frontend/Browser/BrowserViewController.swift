@@ -2223,47 +2223,54 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func topToolbarDidTapBraveShieldsButton(_ topToolbar: TopToolbarView) {
         guard let selectedTab = tabManager.selectedTab else { return }
-        if selectedTab.url?.isLocalUtility == true {
-            return
-        }
-        let shields = ShieldsViewController(tab: selectedTab)
-        shields.shieldsSettingsChanged = { [unowned self] _ in
-            // Update the shields status immediately
-            self.topToolbar.refreshShieldsStatus()
-            
-            // Reload this tab. This will also trigger an update of the brave icon in `TabLocationView` if
-            // the setting changed is the global `.AllOff` shield
-            self.tabManager.selectedTab?.reload()
-            
-            // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
-            // BRAVE TODO: Port over proper tab reloading with Shields
-        }
-        shields.showGlobalShieldsSettings = { [unowned self] vc in
-            vc.dismiss(animated: true) {
-                let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
-                    profile: self.profile,
-                    tabManager: self.tabManager,
-                    feedDataSource: self.feedDataSource
-                )
-                let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
-                if #available(iOS 13.0, *) {
-                    container.isModalInPresentation = true
-                    container.modalPresentationStyle =
-                        UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-                } else {
-                    container.modalPresentationStyle =
-                        UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
-                }
-                shieldsAndPrivacy.navigationItem.rightBarButtonItem = .init(
-                    barButtonSystemItem: .done,
-                    target: container,
-                    action: #selector(SettingsNavigationController.done)
-                )
-                self.present(container, animated: true)
-            }
-        }
-        let container = PopoverNavigationController(rootViewController: shields)
-        let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
+        
+//        if selectedTab.url?.isLocalUtility == true {
+//            return
+//        }
+//        let shields = ShieldsViewController(tab: selectedTab)
+//        shields.shieldsSettingsChanged = { [unowned self] _ in
+//            // Update the shields status immediately
+//            self.topToolbar.refreshShieldsStatus()
+//
+//            // Reload this tab. This will also trigger an update of the brave icon in `TabLocationView` if
+//            // the setting changed is the global `.AllOff` shield
+//            self.tabManager.selectedTab?.reload()
+//
+//            // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
+//            // BRAVE TODO: Port over proper tab reloading with Shields
+//        }
+//        shields.showGlobalShieldsSettings = { [unowned self] vc in
+//            vc.dismiss(animated: true) {
+//                let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
+//                    profile: self.profile,
+//                    tabManager: self.tabManager,
+//                    feedDataSource: self.feedDataSource
+//                )
+//                let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
+//                if #available(iOS 13.0, *) {
+//                    container.isModalInPresentation = true
+//                    container.modalPresentationStyle =
+//                        UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+//                } else {
+//                    container.modalPresentationStyle =
+//                        UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
+//                }
+//                shieldsAndPrivacy.navigationItem.rightBarButtonItem = .init(
+//                    barButtonSystemItem: .done,
+//                    target: container,
+//                    action: #selector(SettingsNavigationController.done)
+//                )
+//                self.present(container, animated: true)
+//            }
+//        }
+//        let container = PopoverNavigationController(rootViewController: shields)
+//        let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
+//        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+        
+        let shareTrackersViewController = ShareTrackersController(tab: selectedTab)
+
+        let popover = PopoverController(contentController: shareTrackersViewController, contentSizeBehavior: .autoLayout)
+        popover.addsConvenientDismissalMargins = false
         popover.present(from: topToolbar.locationView.shieldsButton, on: self)
     }
     
